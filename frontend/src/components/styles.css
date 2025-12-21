@@ -1,0 +1,27 @@
+.message{
+    width: fit-content;
+    padding: 16px;
+}
+
+.messageBoxRight{
+    display: flex;
+    justify-content: right;
+}
+
+.messageBoxLeft{
+    display: flex;
+    justify-content: left;
+}
+
+.userMssg{
+    background-color: grey;
+}
+
+.aiReply{
+    background-color: lightblue;
+}
+
+.inputBox{
+    padding: 12px;
+    width: -webkit-fill-available;
+}
