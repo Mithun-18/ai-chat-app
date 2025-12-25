@@ -1,27 +1,78 @@
-.message{
-    width: fit-content;
-    padding: 16px;
+* {
+  margin: 0;
+  padding: 0;
 }
 
-.messageBoxRight{
-    display: flex;
-    justify-content: right;
+.chatWindow {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.messageBoxLeft{
-    display: flex;
-    justify-content: left;
+.messageContainer {
+  flex-grow: 1;
+  overflow-y: scroll;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.userMssg{
-    background-color: grey;
+.message {
+  width: fit-content;
+  padding: 16px;
 }
 
-.aiReply{
-    background-color: lightblue;
+.messageBoxRight {
+  display: flex;
+  justify-content: right;
 }
 
-.inputBox{
-    padding: 12px;
-    width: -webkit-fill-available;
+.messageBoxLeft {
+  display: flex;
+  justify-content: left;
+}
+
+.userMssg {
+  background-color: #007aff;
+  color: white;
+  border-radius: 18px 18px 4px 18px;
+}
+
+.aiReply {
+  background-color: #f2f2f7;
+  color: #1c1c1e;
+  border-radius: 18px 18px 18px 4px;
+}
+.inputBoxContainer {
+  width: 100%;
+  padding: 16px;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+.inputBox {
+  resize: none;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.aiTyping::after {
+  content: "▌";
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  from,
+  to {
+    color: transparent;
+  }
+  50% {
+    color: #000;
+  }
 }
