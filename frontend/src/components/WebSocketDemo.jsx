@@ -1,9 +1,18 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./styles.css";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+const getInitialMessages = () => {
+  const saved = localStorage.getItem("chat_history");
+  return saved
+    ? JSON.parse(saved)
+    : [{ isUser: false, mssg: "How Can I help You Today" }];
+};
 
 export default function WebSocketDemo() {
   const [socket, setSocket] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => getInitialMessages());
   const [aiReply, setAiReply] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
 
@@ -65,6 +74,23 @@ export default function WebSocketDemo() {
     }
   }, [messages, aiReply]);
 
+  useEffect(() => {
+    if (messages.length > 0) {
+      syncToLocalStorage(messages);
+    }
+  }, [messages]);
+
+  const syncToLocalStorage = (messages) => {
+    localStorage.setItem("chat_history", JSON.stringify(messages));
+  };
+
+  const clearChat = () => {
+    if (window.confirm("Are you sure you want to clear the chat?")) {
+      setMessages([]);
+      localStorage.removeItem("chat_history");
+    }
+  };
+
   const handleKeyDown = (e) => {
     if (!isAiTyping && !e.shiftKey && e.key === "Enter") {
       e.preventDefault();
@@ -84,7 +110,14 @@ export default function WebSocketDemo() {
 
   return (
     <div className="chatWindow">
-      <h2 style={{ padding: "16px" }}>React WebSocket Chat</h2>
+      <div className="chatHeader">
+        <h2 style={{ padding: "16px" }}>React WebSocket Chat</h2>
+        <div>
+          <button onClick={clearChat} className="clearBtn">
+            clear chat
+          </button>
+        </div>
+      </div>
 
       <div className="messageContainer">
         {messages.map((msg, i) => (
@@ -92,17 +125,24 @@ export default function WebSocketDemo() {
             key={i}
             className={`${msg?.isUser ? "messageBoxRight" : "messageBoxLeft"}`}
           >
-            <p
+            <div
               key={i}
               className={`message ${msg?.isUser ? "userMssg" : "aiReply"}`}
             >
-              {msg.mssg}
-            </p>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {msg.mssg}
+              </ReactMarkdown>
+            </div>
           </div>
         ))}
         <div className="messageBoxLeft">
           {isAiTyping && (
-            <p className="message aiReply aiTyping">{aiReply}</p> // typing effect
+            <div className="message aiReply aiTyping">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {aiReply}
+              </ReactMarkdown>
+              {aiReply && <span className="typingCursor">▌</span>}
+            </div> // typing effect
           )}
         </div>
         <div ref={scrollRef} style={{ height: "1px" }}></div>

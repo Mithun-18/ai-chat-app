@@ -61,10 +61,67 @@
   border-radius: 8px;
 }
 
-.aiTyping::after {
-  content: "▌";
-  margin-left: 2px;
+/* Remove extra spacing inside chat bubbles */
+.message p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.message p + p {
+  margin-top: 10px; /* Space between paragraphs */
+}
+
+.message ul,
+.message ol {
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
+/* Style for inline code like `const x = 1` */
+.message code {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+/* Style for code blocks */
+.message pre {
+  background: #1e1e1e;
+  color: #dcdcdc;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.typingCursor {
+  margin-left: 4px;
+  display: inline-block;
   animation: blink 1s step-end infinite;
+  vertical-align: middle;
+}
+
+.chatHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+}
+
+.clearBtn {
+  background: none;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.clearBtn:hover {
+  background: #ff4d4d;
+  color: white;
 }
 
 @keyframes blink {
