@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./styles.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { THEME } from "../constans";
+import { STATUS, THEME } from "../constans";
 import useTheme from "../hooks/useTheme";
 
 const getInitialMessages = () => {
@@ -20,16 +20,58 @@ export default function WebSocketDemo() {
   const [aiReply, setAiReply] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [textValue, setTextValue] = useState("");
+  const [status, setStatus] = useState(STATUS.connecting);
 
   const inputRef = useRef(null);
   const replyRef = useRef("");
   const scrollRef = useRef(null);
   const bufferRef = useRef("");
 
+  const disabelSendMessage = isAiTyping || !textValue || status !== STATUS.open;
+
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080");
-    inputRef.current.focus();
-    setSocket(ws);
+    const connect = () => {
+      const ws = new WebSocket("ws://localhost:8080");
+
+      ws.onopen = () => setStatus(STATUS.open);
+
+      inputRef.current.focus();
+      setSocket(ws);
+
+      ws.onmessage = (event) => {
+        if (event.data === "[END]") {
+          //if all buffered is rendered then only set the message
+          const checkDone = setInterval(() => {
+            if (bufferRef.current.length === 0) {
+              const aiMessage = replyRef.current;
+              if (aiMessage) {
+                setMessages((prev) => [
+                  ...prev,
+                  { isUser: false, mssg: aiMessage },
+                ]);
+              }
+              replyRef.current = "";
+              bufferRef.current = "";
+              inputRef.current.focus();
+              setAiReply("");
+              setIsAiTyping(false);
+              clearInterval(checkDone);
+            }
+          }, 100);
+        } else {
+          replyRef.current = replyRef.current + event.data;
+          bufferRef.current = bufferRef.current + event.data;
+        }
+      };
+
+      ws.onclose = () => {
+        setStatus(STATUS.closed);
+        setTimeout(connect, 6000);
+      };
+
+      ws.onerror = () => setStatus(STATUS.error);
+    };
+    connect();
 
     // typing interval . renders 1 char in 30ms .
     const typingInterval = setInterval(() => {
@@ -40,34 +82,8 @@ export default function WebSocketDemo() {
       }
     }, 10);
 
-    ws.onmessage = (event) => {
-      if (event.data === "[END]") {
-        //if all buffered is rendered then only set the message
-        const checkDone = setInterval(() => {
-          if (bufferRef.current.length === 0) {
-            const aiMessage = replyRef.current;
-            if (aiMessage) {
-              setMessages((prev) => [
-                ...prev,
-                { isUser: false, mssg: aiMessage },
-              ]);
-            }
-            replyRef.current = "";
-            bufferRef.current = "";
-            inputRef.current.focus();
-            setAiReply("");
-            setIsAiTyping(false);
-            clearInterval(checkDone);
-          }
-        }, 100);
-      } else {
-        replyRef.current = replyRef.current + event.data;
-        bufferRef.current = bufferRef.current + event.data;
-      }
-    };
-
     return () => {
-      ws.close();
+      socket?.close();
       clearInterval(typingInterval);
     };
   }, []);
@@ -107,7 +123,12 @@ export default function WebSocketDemo() {
   };
 
   const handleKeyDown = (e) => {
-    if (!isAiTyping && !e.shiftKey && e.key === "Enter") {
+    if (
+      !disabelSendMessage &&
+      !isAiTyping &&
+      !e.shiftKey &&
+      e.key === "Enter"
+    ) {
       e.preventDefault();
       sendMessage();
     }
@@ -116,6 +137,8 @@ export default function WebSocketDemo() {
   const sendMessage = () => {
     const userMessage = inputRef.current.value.trim();
     if (socket && userMessage) {
+      const utterance = new SpeechSynthesisUtterance(userMessage);
+      window.speechSynthesis.speak(utterance);
       setMessages((prev) => [...prev, { isUser: true, mssg: userMessage }]);
       socket.send(userMessage);
       inputRef.current.value = "";
@@ -128,16 +151,28 @@ export default function WebSocketDemo() {
       {/* Glassmorphism Header */}
       <header className="chatHeader">
         <div className="headerBrand">
-          <div className="statusDot"></div>
+          <div className="topHeader">
+            <div className="statusSection">
+              <div className={`statusDot ${status}`}></div>
+              {status === "closed" && (
+                <span className="retryText">Reconnecting...</span>
+              )}
+            </div>
+            <div className="headerActions">
+              <button onClick={clearChat} className="clearBtn">
+                {/* Consider adding a small trash icon here later */}
+                Clear Chat
+              </button>
+              <button
+                onClick={toggleTheme}
+                className="themeBtn"
+                title="Toggle Theme"
+              >
+                {theme === THEME.light ? "🌙" : "☀️"}
+              </button>
+            </div>
+          </div>
           <h2 className="chatHeaderTitle">AI Assistant</h2>
-        </div>
-        <div className="headerActions">
-          <button onClick={clearChat} className="clearBtn">
-            Clear
-          </button>
-          <button onClick={toggleTheme} className="themeBtn">
-            {theme === THEME.light ? "🌙" : "☀️"}
-          </button>
         </div>
       </header>
 
@@ -183,10 +218,10 @@ export default function WebSocketDemo() {
           <button
             className="sendIcon"
             onClick={sendMessage}
-            disabled={isAiTyping || !textValue}
+            disabled={disabelSendMessage}
             style={{
-              opacity: isAiTyping || !textValue ? 0.4 : 1,
-              cursor: isAiTyping || !textValue ? "default" : "pointer",
+              opacity: disabelSendMessage ? 0.4 : 1,
+              cursor: disabelSendMessage ? "default" : "pointer",
             }}
           >
             <span style={{ fontSize: "24px", fontWeight: "bold" }}>↑</span>

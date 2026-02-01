@@ -1,3 +1,23 @@
+body {
+  /* This ensures the background and text color fade smoothly */
+  transition:
+    background-color 0.3s ease-in-out,
+    color 0.3s ease-in-out;
+}
+
+/* Also apply it to your main containers and bubbles so they sync up */
+.chatWindow,
+.chatHeader,
+.messageBubble,
+.inputArea,
+.inputWrapper {
+  transition:
+    background-color 0.3s ease-in-out,
+    border-color 0.3s ease-in-out,
+    color 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
 /* Layout Overhaul */
 .chatWindow {
   max-width: 1000px;
@@ -31,6 +51,29 @@
   background: #22c55e;
   border-radius: 50%;
   box-shadow: 0 0 8px #22c55e;
+}
+
+.statusDot.open {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+.statusDot.closed,
+.statusDot.error {
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+
+.statusSection {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.retryText {
+  font-size: 14px;
+  color: var(--text-secondary);
+  animation: pulse 1.5s infinite;
 }
 
 .messageContainer {
@@ -155,6 +198,57 @@
   transform: scale(0.95);
 }
 
+.topHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Base style for both buttons to ensure they match */
+.headerActions button {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-light);
+  background: var(--card-bg);
+  color: var(--text-primary);
+}
+
+/* Specific styling for the Clear button */
+.clearBtn {
+  padding: 0 16px;
+  color: #ef4444 !important; /* Soft red for danger actions */
+  border-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+.clearBtn:hover {
+  background-color: #fef2f2 !important; /* Very light red tint */
+  border-color: #ef4444 !important;
+}
+
+/* Specific styling for the Theme Toggle */
+.themeBtn {
+  width: 36px; /* Makes it a perfect square */
+  padding: 0;
+  font-size: 18px;
+}
+
+.themeBtn:hover {
+  background-color: var(--bg-color);
+  border-color: var(--brand-color);
+}
+
 /* scroll bar */
 /* 1. Target the Message Area and the Textarea */
 .messageContainer::-webkit-scrollbar,
@@ -199,4 +293,22 @@
 
 .premiumInput::-webkit-scrollbar-thumb {
   background-color: var(--input-border);
+}
+
+@media (max-width: 1024px) {
+  body {
+    padding: 0;
+    margin: 0;
+  }
+  .chatWindow {
+    margin: 0;
+    border-radius: 0;
+    height: 100vh;
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
 }
