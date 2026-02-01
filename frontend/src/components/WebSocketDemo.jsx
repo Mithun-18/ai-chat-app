@@ -21,6 +21,7 @@ export default function WebSocketDemo() {
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [textValue, setTextValue] = useState("");
   const [status, setStatus] = useState(STATUS.connecting);
+  const [isSpeakingIndex, setIsSpeakingIndex] = useState(null);
 
   const inputRef = useRef(null);
   const replyRef = useRef("");
@@ -137,13 +138,43 @@ export default function WebSocketDemo() {
   const sendMessage = () => {
     const userMessage = inputRef.current.value.trim();
     if (socket && userMessage) {
-      const utterance = new SpeechSynthesisUtterance(userMessage);
-      window.speechSynthesis.speak(utterance);
       setMessages((prev) => [...prev, { isUser: true, mssg: userMessage }]);
       socket.send(userMessage);
       inputRef.current.value = "";
       setIsAiTyping(true);
     }
+  };
+
+  const SpeakButton = ({ message, index }) => (
+    <button
+      className={`speakBtn ${isSpeakingIndex === index ? "active" : ""}`}
+      onClick={() => speak(message, index)}
+    >
+      🔊
+    </button>
+  );
+
+  const speak = (text, index) => {
+    // If already speaking, stop it
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeakingIndex(null);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    const voices = window.speechSynthesis.getVoices();
+    utterance.voice =
+      voices.find((v) => v.name.includes("Google UK English Female")) ||
+      voices[0];
+    utterance.rate = 0.9; // Slightly slower for clearer communication
+
+    utterance.onstart = () => setIsSpeakingIndex(index);
+    utterance.onend = () => setIsSpeakingIndex(null);
+    utterance.onerror = () => setIsSpeakingIndex(null);
+
+    window.speechSynthesis.speak(utterance);
   };
 
   return (
@@ -182,6 +213,7 @@ export default function WebSocketDemo() {
             key={i}
             className={`messageRow ${msg?.isUser ? "rowRight" : "rowLeft"}`}
           >
+            {msg?.isUser && <SpeakButton message={msg.mssg} index={i} />}
             <div
               className={`messageBubble ${msg?.isUser ? "userBubble" : "aiBubble"}`}
             >
@@ -189,6 +221,7 @@ export default function WebSocketDemo() {
                 {msg.mssg}
               </ReactMarkdown>
             </div>
+            {!msg?.isUser && <SpeakButton message={msg.mssg} index={i} />}
           </div>
         ))}
 
