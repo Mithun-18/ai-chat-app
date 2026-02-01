@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import "./styles.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { THEME } from "../constans";
+import useTheme from "../hooks/useTheme";
 
 const getInitialMessages = () => {
   const saved = localStorage.getItem("chat_history");
@@ -11,10 +13,13 @@ const getInitialMessages = () => {
 };
 
 export default function WebSocketDemo() {
+  const { theme, toggleTheme } = useTheme();
+
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState(() => getInitialMessages());
   const [aiReply, setAiReply] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
+  const [textValue, setTextValue] = useState("");
 
   const inputRef = useRef(null);
   const replyRef = useRef("");
@@ -80,6 +85,16 @@ export default function WebSocketDemo() {
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+      const newHeight = Math.min(inputRef.current.scrollHeight, 360);
+      inputRef.current.style.height = `${newHeight}px`;
+      inputRef.current.style.overflowY =
+        inputRef.current.scrollHeight > 360 ? "auto" : "hidden";
+    }
+  }, [textValue]);
+
   const syncToLocalStorage = (messages) => {
     localStorage.setItem("chat_history", JSON.stringify(messages));
   };
@@ -110,24 +125,30 @@ export default function WebSocketDemo() {
 
   return (
     <div className="chatWindow">
-      <div className="chatHeader">
-        <h2 style={{ padding: "16px" }}>React WebSocket Chat</h2>
-        <div>
+      {/* Glassmorphism Header */}
+      <header className="chatHeader">
+        <div className="headerBrand">
+          <div className="statusDot"></div>
+          <h2 className="chatHeaderTitle">AI Assistant</h2>
+        </div>
+        <div className="headerActions">
           <button onClick={clearChat} className="clearBtn">
-            clear chat
+            Clear
+          </button>
+          <button onClick={toggleTheme} className="themeBtn">
+            {theme === THEME.light ? "🌙" : "☀️"}
           </button>
         </div>
-      </div>
+      </header>
 
       <div className="messageContainer">
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`${msg?.isUser ? "messageBoxRight" : "messageBoxLeft"}`}
+            className={`messageRow ${msg?.isUser ? "rowRight" : "rowLeft"}`}
           >
             <div
-              key={i}
-              className={`message ${msg?.isUser ? "userMssg" : "aiReply"}`}
+              className={`messageBubble ${msg?.isUser ? "userBubble" : "aiBubble"}`}
             >
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {msg.mssg}
@@ -135,29 +156,44 @@ export default function WebSocketDemo() {
             </div>
           </div>
         ))}
-        <div className="messageBoxLeft">
-          {isAiTyping && (
-            <div className="message aiReply aiTyping">
+
+        {isAiTyping && (
+          <div className="messageRow rowLeft">
+            <div className="messageBubble aiBubble">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {aiReply}
               </ReactMarkdown>
-              {aiReply && <span className="typingCursor">▌</span>}
-            </div> // typing effect
-          )}
-        </div>
-        <div ref={scrollRef} style={{ height: "1px" }}></div>
+              <span className="typingCursor">▌</span>
+            </div>
+          </div>
+        )}
+        <div ref={scrollRef} />
       </div>
 
-      <div className="inputBoxContainer">
-        <textarea
-          id="textMssg"
-          ref={inputRef}
-          rows={4}
-          placeholder="Type message"
-          onKeyDown={handleKeyDown}
-          className="inputBox"
-        />
-      </div>
+      <footer className="inputArea">
+        <div className="inputWrapper">
+          <textarea
+            ref={inputRef}
+            rows={1}
+            placeholder="Ask me anything..."
+            onChange={(e) => setTextValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="premiumInput"
+          />
+          <button
+            className="sendIcon"
+            onClick={sendMessage}
+            disabled={isAiTyping || !textValue}
+            style={{
+              opacity: isAiTyping || !textValue ? 0.4 : 1,
+              cursor: isAiTyping || !textValue ? "default" : "pointer",
+            }}
+          >
+            <span style={{ fontSize: "24px", fontWeight: "bold" }}>↑</span>
+          </button>
+        </div>
+        <p className="footerNotice">© {new Date().getFullYear()} Mithun</p>
+      </footer>
     </div>
   );
 }

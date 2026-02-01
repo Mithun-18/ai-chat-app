@@ -1,135 +1,202 @@
-* {
-  margin: 0;
-  padding: 0;
-}
-
+/* Layout Overhaul */
 .chatWindow {
-  height: 100vh;
-  overflow: hidden;
+  max-width: 1000px;
+  height: 95vh;
+  margin: 2.5vh auto;
+  border-radius: 24px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-premium);
   display: flex;
   flex-direction: column;
+  background: var(--bg-color);
+  overflow: hidden;
+}
+
+/* Header Styling */
+.chatHeader {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border-light);
+  z-index: 10;
+}
+
+.chatHeaderTitle {
+  color: var(--text-primary);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #22c55e;
 }
 
 .messageContainer {
-  flex-grow: 1;
-  overflow-y: scroll;
-  padding: 16px;
+  flex-grow: 1; /* This takes up all available space, pushing input to the bottom */
+  overflow-y: auto; /* Allow scrolling inside this section only */
+  padding: 24px;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 
-.message {
-  width: fit-content;
-  padding: 16px;
-}
-
-.messageBoxRight {
+/* Bubble Design */
+.messageRow {
   display: flex;
-  justify-content: right;
 }
 
-.messageBoxLeft {
-  display: flex;
-  justify-content: left;
+.rowRight {
+  justify-content: flex-end;
+}
+.rowLeft {
+  justify-content: flex-start;
 }
 
-.userMssg {
-  background-color: #007aff;
-  color: white;
-  border-radius: 18px 18px 4px 18px;
+.messageBubble {
+  max-width: 75%;
+  padding: 14px 20px;
+  font-size: 15px;
+  line-height: 1.6;
+  transition: transform 0.2s ease;
 }
 
-.aiReply {
-  background-color: #f2f2f7;
-  color: #1c1c1e;
-  border-radius: 18px 18px 18px 4px;
-}
-.inputBoxContainer {
-  width: 100%;
-  padding: 16px;
-  background-color: white;
-  box-sizing: border-box;
-}
-
-.inputBox {
-  resize: none;
-  padding: 12px;
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-
-/* Remove extra spacing inside chat bubbles */
-.message p {
+.messageBubble p {
   margin: 0;
-  line-height: 1.5;
+  padding: 4px;
 }
 
-.message p + p {
-  margin-top: 10px; /* Space between paragraphs */
-}
-
-.message ul,
-.message ol {
-  padding-left: 20px;
-  margin: 10px 0;
-}
-
-/* Style for inline code like `const x = 1` */
-.message code {
-  background: rgba(0, 0, 0, 0.1);
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-family: monospace;
-}
-
-/* Style for code blocks */
-.message pre {
-  background: #1e1e1e;
-  color: #dcdcdc;
-  padding: 12px;
-  border-radius: 8px;
-  overflow-x: auto;
-  margin: 10px 0;
-}
-
-.typingCursor {
-  margin-left: 4px;
-  display: inline-block;
-  animation: blink 1s step-end infinite;
-  vertical-align: middle;
-}
-
-.chatHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px;
-}
-
-.clearBtn {
-  background: none;
-  border: 1px solid #ff4d4d;
-  color: #ff4d4d;
-  padding: 4px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.clearBtn:hover {
-  background: #ff4d4d;
+.userBubble {
+  background: var(--msg-user-bg);
   color: white;
+  border-radius: 20px 20px 4px 20px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
-@keyframes blink {
-  from,
-  to {
-    color: transparent;
-  }
-  50% {
-    color: #000;
-  }
+.aiBubble {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border-radius: 20px 20px 20px 4px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Modern Input Bar */
+.inputArea {
+  flex-shrink: 0;
+  padding: 24px;
+  background: var(--bg-color);
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  position: relative;
+  background: var(--input-bg);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  padding: 8px 12px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.inputWrapper:focus-within {
+  border-color: var(--brand-color);
+  box-shadow: 0 0 0 4px var(--ring-color);
+}
+
+.premiumInput {
+  flex-grow: 1;
+  padding: 8px 0;
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--text-primary);
+  resize: none;
+  outline: none;
+}
+
+.footerNotice {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 12px;
+}
+
+.sendIcon {
+  background-color: var(--brand-color);
+  color: white;
+  border: none;
+  border-radius: 50%; /* Perfect circle */
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+  flex-shrink: 0; /* Prevents button from being squashed */
+  margin-bottom: 4px; /* Aligns with the bottom line of text */
+}
+
+.sendIcon:hover {
+  background-color: var(--brand-hover);
+  transform: scale(1.05); /* Subtle pop effect */
+}
+
+.sendIcon:active {
+  transform: scale(0.95);
+}
+
+/* scroll bar */
+/* 1. Target the Message Area and the Textarea */
+.messageContainer::-webkit-scrollbar,
+.premiumInput::-webkit-scrollbar {
+  width: 6px; /* Very thin scrollbar */
+}
+
+/* 2. The Track (the background part) */
+.messageContainer::-webkit-scrollbar-track,
+.premiumInput::-webkit-scrollbar-track {
+  background: transparent; /* Keep it invisible so it doesn't look boxy */
+}
+
+/* 3. The Thumb (the part you drag) */
+.messageContainer::-webkit-scrollbar-thumb,
+.premiumInput::-webkit-scrollbar-thumb {
+  background-color: var(--border-light); /* Subtle color from your theme */
+  border-radius: 20px; /* Fully rounded edges */
+  border: 2px solid transparent; /* Acts as padding inside the 6px width */
+}
+
+/* 4. Hover effect - makes the UI feel interactive */
+.messageContainer::-webkit-scrollbar-thumb:hover,
+.premiumInput::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-secondary);
+}
+
+.messageContainer,
+.premiumInput {
+  scrollbar-width: thin; /* Options: auto, thin, none */
+  scrollbar-color: var(--border-light) transparent;
+}
+
+.messageContainer {
+  scroll-behavior: smooth; /* Makes auto-scrolling look like a slide, not a skip */
+  overflow-y: overlay; /* Allows scrollbar to sit on top of content (Webkit only) */
+}
+
+.premiumInput {
+  padding-right: 12px; /* Space for the scrollbar */
+}
+
+.premiumInput::-webkit-scrollbar-thumb {
+  background-color: var(--input-border);
 }

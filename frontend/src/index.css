@@ -1,0 +1,42 @@
+:root {
+  /* Surface Colors */
+  --bg-color: #f8fafc; /* Very light slate */
+  --header-bg: rgba(255, 255, 255, 0.8); /* Glassmorphism */
+  --card-bg: #ffffff;
+
+  /* Text */
+  --text-primary: #0f172a; /* Deep charcoal */
+  --text-secondary: #64748b; /* Muted slate */
+  --text-on-accent: #ffffff;
+
+  /* Brand/Accent */
+  --brand-color: #6366f1; /* Indigo-600 */
+  --brand-hover: #4f46e5;
+
+  /* Bubbles */
+  --msg-user-bg: var(--brand-color);
+  --msg-ai-bg: #ffffff;
+
+  /* Details */
+  --input-bg: #ffffff;
+  --border-light: #e2e8f0;
+  --ring-color: rgba(99, 102, 241, 0.2);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-premium:
+    0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] {
+  --bg-color: #020617; /* Near black slate */
+  --header-bg: rgba(15, 23, 42, 0.8);
+  --card-bg: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --msg-user-bg: #4f46e5;
+  --msg-ai-bg: #1e293b;
+  --input-bg: #0f172a;
+  --border-light: #334155;
+  --ring-color: rgba(99, 102, 241, 0.3);
+}
